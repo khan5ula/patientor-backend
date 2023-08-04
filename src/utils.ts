@@ -1,4 +1,4 @@
-import { NewPatient, Gender } from './types';
+import { NewPatient, Gender, Entry } from './types';
 
 const isString = (text: unknown): text is string => {
   return typeof text === 'string' || text instanceof String;
@@ -60,6 +60,36 @@ const parseOccupation = (occupation: unknown): string => {
   return occupation;
 };
 
+const parseEntries = (entries: unknown): Entry[] => {
+  if (!entries) {
+    return [];
+  }
+
+  if (Array.isArray(entries)) {
+    entries.forEach((entry) => {
+      if (!('type' in entry)) {
+        throw new Error("Entry is missing 'type' field.");
+      }
+
+      if (!isString(entry.type)) {
+        throw new Error('Invalid entry type.');
+      }
+
+      if (
+        entry.type !== 'HealthCheck' &&
+        entry.type !== 'Hospital' &&
+        entry.type !== 'OccupationalHealthcare'
+      ) {
+        throw new Error('Invalid entry type.');
+      }
+    });
+  } else {
+    throw new Error('Invalid entries format. Expected an array.');
+  }
+
+  return entries as Entry[];
+};
+
 export const toNewPatient = (object: unknown): NewPatient => {
   if (!object || typeof object !== 'object') {
     throw new Error('Incorrect or missing data');
@@ -70,7 +100,8 @@ export const toNewPatient = (object: unknown): NewPatient => {
     'dateOfBirth' in object &&
     'ssn' in object &&
     'gender' in object &&
-    'occupation' in object
+    'occupation' in object &&
+    'entries' in object
   ) {
     const newEntry: NewPatient = {
       name: parseName(object.name),
@@ -78,7 +109,7 @@ export const toNewPatient = (object: unknown): NewPatient => {
       ssn: parseSsn(object.ssn),
       gender: parseGender(object.gender),
       occupation: parseOccupation(object.occupation),
-      entries: [],
+      entries: parseEntries(object.entries),
     };
 
     return newEntry;
