@@ -61,10 +61,6 @@ const parseOccupation = (occupation: unknown): string => {
 };
 
 const parseEntries = (entries: unknown): Entry[] => {
-  if (!entries) {
-    return [];
-  }
-
   if (Array.isArray(entries)) {
     entries.forEach((entry) => {
       if (!('type' in entry)) {
