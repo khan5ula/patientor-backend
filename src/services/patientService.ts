@@ -2,7 +2,13 @@ import data from '../../data/patients';
 import { v1 as uuid } from 'uuid';
 import { parseId } from '../utils';
 
-import { NewPatient, NonSensitivePatient, Patient } from '../types';
+import {
+  Entry,
+  NewEntry,
+  NewPatient,
+  NonSensitivePatient,
+  Patient,
+} from '../types';
 
 const getEntries = (): Patient[] => {
   return data;
@@ -33,8 +39,25 @@ const addPatient = (entry: NewPatient): Patient => {
     ...entry,
   };
 
-  data.concat(newPatient);
+  data.push(newPatient);
   return newPatient;
+};
+
+const addEntry = (patientId: string, entry: NewEntry): Entry => {
+  const id: string = parseId(uuid());
+  const newEntry: Entry = {
+    id: id,
+    ...entry,
+  };
+
+  const patientIndex = data.findIndex((p) => p.id === patientId);
+
+  if (patientIndex === -1) {
+    throw new Error('Patient not found');
+  }
+
+  data[patientIndex].entries = data[patientIndex].entries.concat(newEntry);
+  return newEntry;
 };
 
 export default {
@@ -42,4 +65,5 @@ export default {
   getNonSensitiveEntries,
   addPatient,
   findById,
+  addEntry,
 };
