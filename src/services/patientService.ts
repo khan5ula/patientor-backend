@@ -56,7 +56,7 @@ const addEntry = (patientId: string, entry: NewEntry): Entry => {
     throw new Error('Patient not found');
   }
 
-  data[patientIndex].entries = data[patientIndex].entries.concat(newEntry);
+  data[patientIndex].entries.push(newEntry);
   return newEntry;
 };
 
