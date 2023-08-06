@@ -158,7 +158,7 @@ const parseHealthCheckRating = (rating: unknown): HealthCheckRating => {
     typeof rating !== 'number' ||
     !Object.values(HealthCheckRating).includes(rating)
   ) {
-    throw new Error('Invalid health check rating');
+    throw new Error(`Invalid health check rating: ${rating}`);
   }
 
   return rating as HealthCheckRating;
@@ -185,11 +185,19 @@ const parseSickLeave = (object: unknown): SickLeave => {
 };
 
 const parseDiagnosisCodes = (object: unknown): Array<Diagnosis['code']> => {
-  if (!object || typeof object !== 'object' || !('diagnosisCodes' in object)) {
-    return [] as Array<Diagnosis['code']>;
+  if (!object) {
+    return [];
   }
 
-  return object.diagnosisCodes as Array<Diagnosis['code']>;
+  if (Array.isArray(object)) {
+    object.forEach((element) => {
+      if (!isString(element)) {
+        throw new Error('Invalid diagnosis code');
+      }
+    });
+  }
+
+  return object as Array<Diagnosis['code']>;
 };
 
 export const toNewEntry = (object: unknown): NewEntry => {
